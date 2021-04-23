@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:translator/translator.dart';
 
 void main() => runApp(Mausam3());
 
@@ -20,6 +21,11 @@ final apiKey =
     "94f1d452ba2daae89dad70d3c9e49fb6"; //"9ac4676a4c946c8c0f3118ba0394e992";
 
 class _Mausam3State extends State<Mausam3> {
+  GoogleTranslator translator =
+      new GoogleTranslator(); //using google translator
+
+  String out;
+
   bool isLoading = true;
   var weatherData;
   String weather;
@@ -30,6 +36,8 @@ class _Mausam3State extends State<Mausam3> {
   String pres;
   String bgImg;
   String iconUrl;
+  String desc;
+  String hindicity;
 
   getWeather(lat, lon) async {
     try {
@@ -41,17 +49,21 @@ class _Mausam3State extends State<Mausam3> {
         print("\n");
         print(weatherData["weather"][0]["main"]);
         print("\n");
+        print(weatherData["name"]);
         print(weatherData['wind']['speed']);
         print(weatherData['main']['humidity']);
         print(weatherData['main']['pressure']);
         print(weatherData["weather"][0]["description"]);
         weather = weatherData['weather'][0]['main'];
         city = weatherData["name"];
-        temp = (weatherData["weather"][0]["description"]);
+        desc = (weatherData["weather"][0]["description"]);
+        temp = (weatherData["main"]["temp"]).toString();
         wind = (weatherData['wind']['speed']).toString();
         humid = (weatherData['main']['humidity']).toString();
         pres = (weatherData['main']['pressure']).toString();
         print(weatherData['weather'][0]['main']); //weather[0].main
+        trans();
+        citytrans();
         setState(() {
           isLoading = false;
         });
@@ -84,13 +96,35 @@ class _Mausam3State extends State<Mausam3> {
     super.initState();
   }
 
+  void trans() {
+    translator.translate(desc, from: "en", to: 'hi') //translating to hi = hindi
+        .then((output) {
+      setState(() {
+        out = output
+            .toString(); //placing the translated text to the String to be used
+      });
+      print(out);
+    });
+  }
+
+  void citytrans() {
+    translator.translate(city, from: "en", to: 'hi') //translating to hi = hindi
+        .then((output) {
+      setState(() {
+        hindicity = output
+            .toString(); //placing the translated text to the String to be used
+      });
+      print(out);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (weather == 'Clear') {
       bgImg = 'assets/sunny.jpg';
     } else if (weather == 'Smoke') {
       bgImg = 'assets/smoke.jpg';
-    } else if (weather == 'Rainy') {
+    } else if (weather == 'Rain') {
       bgImg = 'assets/rainy.jpg';
     } else if (weather == 'Clouds') {
       bgImg = 'assets/cloudy.jpeg';
@@ -103,18 +137,18 @@ class _Mausam3State extends State<Mausam3> {
       iconUrl = 'assets/sun.svg';
     } else if (weather == 'Night') {
       iconUrl = 'assets/moon.svg';
-    } else if (weather == 'Rainy') {
+    } else if (weather == 'Rain') {
       iconUrl = 'assets/rain.svg';
     } else if (weather == 'Clouds' ||
         weather == 'Smoke' ||
         weather == 'Haze' ||
         weather == 'Snow') {
       iconUrl = 'assets/cloudy.svg';
-    }
-    /*else if (weather == 'Snow') {
+    } else if (weather == 'Snow') {
       iconUrl = 'assets/snow.svg';
-    }*/
+    }
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         resizeToAvoidBottomPadding: false,
         extendBodyBehindAppBar: true,
@@ -148,27 +182,27 @@ class _Mausam3State extends State<Mausam3> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              height: 150,
+                              height: 100,
                             ),
                             Text(
-                              city != null
-                                  ? city
+                              hindicity != null
+                                  ? hindicity
                                   : 'null', //locationList[index].city,
                               style: GoogleFonts.lato(
-                                fontSize: 35,
+                                fontSize: 50,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                             SizedBox(
-                              height: 5,
+                              height: 3,
                             ),
                             Text(
-                              weather != null
-                                  ? weather
+                              desc != null
+                                  ? desc
                                   : 'null', //locationList[index].dateTime,
-                              style: GoogleFonts.lato(
-                                fontSize: 14,
+                              style: GoogleFonts.acme(
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -178,16 +212,29 @@ class _Mausam3State extends State<Mausam3> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              temp != null
-                                  ? temp
-                                  : 'null', //locationList[index].temparature,
+                            Row(
+                              children: [
+                                Text(
+                                  temp != null
+                                      ? temp
+                                      : 'null', //locationList[index].temparature,
 
-                              style: GoogleFonts.lato(
-                                fontSize: 85,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.white,
-                              ),
+                                  style: GoogleFonts.lato(
+                                    fontSize: 75,
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  "\u00B0C", //locationList[index].temparature,
+
+                                  style: GoogleFonts.lato(
+                                    fontSize: 75,
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                             Row(
                               children: [
@@ -209,6 +256,19 @@ class _Mausam3State extends State<Mausam3> {
                                   ),
                                 ),
                               ],
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              out != null
+                                  ? out
+                                  : 'null', //locationList[index].dateTime,
+                              style: GoogleFonts.lato(
+                                fontSize: 70,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
@@ -236,7 +296,7 @@ class _Mausam3State extends State<Mausam3> {
                               Text(
                                 'Wind',
                                 style: GoogleFonts.lato(
-                                  fontSize: 14,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -263,14 +323,13 @@ class _Mausam3State extends State<Mausam3> {
                                 children: [
                                   Container(
                                     height: 5,
-                                    width: 50,
+                                    width: 70,
                                     color: Colors.white38,
                                   ),
                                   Container(
                                     height: 5,
-                                    width: //double.parse(wind)
-                                        3.29 /
-                                            2, //locationList[index].wind / 2,
+                                    width: double.parse(
+                                        wind), //locationList[index].wind / 2,
                                     color: Colors.greenAccent,
                                   ),
                                 ],
@@ -282,7 +341,7 @@ class _Mausam3State extends State<Mausam3> {
                               Text(
                                 'Pressure',
                                 style: GoogleFonts.lato(
-                                  fontSize: 14,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -309,12 +368,13 @@ class _Mausam3State extends State<Mausam3> {
                                 children: [
                                   Container(
                                     height: 5,
-                                    width: 50,
+                                    width: 70,
                                     color: Colors.white38,
                                   ),
                                   Container(
                                     height: 5,
-                                    width: 2, //locationList[index].rain / 2,
+                                    width: int.parse(pres) /
+                                        100, //locationList[index].rain / 2,
                                     color: Colors.redAccent,
                                   ),
                                 ],
@@ -326,7 +386,7 @@ class _Mausam3State extends State<Mausam3> {
                               Text(
                                 'Humidity',
                                 style: GoogleFonts.lato(
-                                  fontSize: 14,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -353,7 +413,7 @@ class _Mausam3State extends State<Mausam3> {
                                 children: [
                                   Container(
                                     height: 5,
-                                    width: 50,
+                                    width: 70,
                                     color: Colors.white38,
                                   ),
                                   Container(
