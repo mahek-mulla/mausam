@@ -62,8 +62,6 @@ class _Mausam3State extends State<Mausam3> {
         humid = (weatherData['main']['humidity']).toString();
         pres = (weatherData['main']['pressure']).toString();
         print(weatherData['weather'][0]['main']); //weather[0].main
-        trans();
-        citytrans();
         setState(() {
           isLoading = false;
         });
