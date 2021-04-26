@@ -18,7 +18,7 @@ class Mausam3 extends StatefulWidget {
 
 final url = "https://api.openweathermap.org/data/2.5/weather";
 final apiKey =
-    "94f1d452ba2daae89dad70d3c9e49fb6"; //"9ac4676a4c946c8c0f3118ba0394e992";
+    "add_your own api key";
 
 class _Mausam3State extends State<Mausam3> {
   GoogleTranslator translator =
